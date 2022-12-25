@@ -13,5 +13,8 @@
             "binaryPath": "/home/test/Pwatch/build/pwatch",
             "binaryArgs": []
         }
-    ]
+    ],
+    "files.associations": {
+        "time.h": "c"
+    }
 }
