@@ -67,7 +67,7 @@ extern pthread_mutex_t lock;
 
 const char *procStatPath = "/proc/stat";
 
-int pwatch_parseStat (const char* line, int len);
+int pwatch_parseStat (void);
 
 int pwatch_readStat (void);
 

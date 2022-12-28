@@ -47,14 +47,21 @@ const char* pwatch_errToString (int errEnum)
   * pwatch_parseStat
   *     parse / fill the pwatch_cpuStat
  **/
-int pwatch_parseStat(const char* line, int len)
+int pwatch_parseStat(void)
 {
-    printf("line %s length %d \n", line, len);
-    // pwatch_queueLineBuf aux;
-    // while (!pwatch_semaphore.empty) {
+    pthread_mutex_lock(&lock);
+    readSemaphore->nmb--;
+    if (readSemaphore->fullFlg == true) {
+        readSemaphore->fullFlg = false;
+        pthread_cond_signal(&readSemaphore->full);
+    } else if (readSemaphore->nmb == 0){
+        readSemaphore->emptyFlg = true;
+        if(!pthread_cond_wait(&readSemaphore->full, &lock))
+            return PWATCH_ERR_FAILED_TO_PROCESS_SIGNAL;
+    }
+    pthread_mutex_unlock(&lock);
 
-    //     printf("line %s length %d \n", line, len);
-    // }
+
     return PWATCH_SUCCESS;
 }
 
@@ -99,15 +106,6 @@ int pwatch_readStat(void)
         if (procStat == NULL)
             return PWATCH_ERR_FAILED_TO_OPEN;
 
-        // ret_line_size = getline(&line, &len, procStat);
-
-        // while (ret_line_size < 0)
-        // free(line);
-        // line = NULL;
-        // len = 0;
-        // ret_line_size = getline(&line, &len, procStat);
-        // fclose(procStat);
-
         ret_line_size = getline(&lineStruct->line, &len, procStat);
         if (feof(procStat)) {
             fclose(procStat);
@@ -116,7 +114,8 @@ int pwatch_readStat(void)
         } else if (ret_line_size < 0)
             return PWATCH_ERR_FAILED_TO_READ;
 
-        lineStruct->next = (pwatch_queueLineBuf*)malloc(sizeof(pwatch_queueLineBuf));
+        lineStruct->next =
+                    (pwatch_queueLineBuf*)malloc(sizeof(pwatch_queueLineBuf));
         if (lineStruct->next == NULL)
             return PWATCH_ERR_FAILED_TO_ACQUIRE_MEMORY;
 
@@ -133,7 +132,7 @@ int pwatch_readStat(void)
             readSemaphore->fullFlg = true;
             if (!pthread_cond_wait(&readSemaphore->full, &lock))
                 return PWATCH_ERR_FAILED_TO_PROCESS_SIGNAL;
-        } else if (readSemaphore->nmb == 1){
+        } else if (readSemaphore->emptyFlg){
             readSemaphore->emptyFlg = false;
             pthread_cond_signal(&readSemaphore->empty);
         }
