@@ -14,12 +14,14 @@ enum pwatch_errNum {
     PWATCH_ERR_FAILED_TO_READ,
     PWATCH_ERR_FAILED_TO_ACQUIRE_MEMORY,
     PWATCH_ERR_FAILED_TO_PROCESS_ADMIN_FLAG,
-    PWATCH_ERR_FAILED_TO_PROCESS_SIGNAL
+    PWATCH_ERR_FAILED_TO_PROCESS_SIGNAL,
+    PWATCH_ERR_FAILED_TO_PROCESS_STATUS
 };
 
 enum pwatch_adminFlagsNum {
     PWATCH_ADMIN_READ           = BIT(0),
-    PWATCH_ADMIN_PROCESS        = BIT(1),
+    PWATCH_ADMIN_PARSE          = BIT(1),
+    PWATCH_ADMIN_PARSE_CLOSED   = BIT(29),
     PWATCH_ADMIN_READ_CLOSED    = BIT(30),
     PWATCH_ADMIN_CLOSE          = BIT(31)
 };
@@ -31,13 +33,13 @@ typedef struct pwatch_queueLineBuf
 } pwatch_queueLineBuf;
 
 typedef struct pwatch_cpuStat {
-    int user;       /* normal processes executing in user mode */
-    int nice;       /* niced processes executing in user mode */
-    int system;     /* processes executing in kernel mode */
-    int idle;       /* twiddling thumbs */
-    int iowait;     /* waiting for I/O to complete */
-    int irq;        /* servicing interrupts */
-    int softirq;    /* servicing softirqs */
+    unsigned int user;       /* normal processes executing in user mode */
+    unsigned int nice;       /* niced processes executing in user mode */
+    unsigned int system;     /* processes executing in kernel mode */
+    unsigned int idle;       /* twiddling thumbs */
+    unsigned int iowait;     /* waiting for I/O to complete */
+    unsigned int irq;        /* servicing interrupts */
+    unsigned int softirq;    /* servicing softirqs */
 } pwatch_cpuStat;
 
 typedef struct pwatch_cpuStatList {
@@ -47,6 +49,15 @@ typedef struct pwatch_cpuStatList {
     void* back;
 } pwatch_cpuStatList;
 
+typedef struct pwatch_parsedInfo {
+    pwatch_cpuStatList *cpuStatList;
+    unsigned int ctxt;
+    unsigned int btime;
+    unsigned int processes;
+    unsigned int procsRunning;
+    unsigned int procsBlocked;
+} pwatch_parsedInfo;
+
 typedef struct pwatch_semaphore {
     int nmb;
     bool fullFlg;
@@ -54,6 +65,8 @@ typedef struct pwatch_semaphore {
     bool emptyFlg;
     pthread_cond_t empty;
 } pwatch_semaphore;
+
+extern pwatch_parsedInfo parsedInfo;
 
 extern pwatch_semaphore *readSemaphore;
 
