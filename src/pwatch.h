@@ -5,22 +5,25 @@
 #include <stdbool.h>
 #include <pthread.h>
 
-#define PWATCH_LINE_LIMIT 26
+#define PWATCH_LINE_LIMIT 30
 #define BIT(n) (0x1U << (n))
 
 enum pwatch_errNum {
     PWATCH_SUCCESS,
+    PWATCH_ERR_NULL_TERMINATOR,
     PWATCH_ERR_FAILED_TO_OPEN,
     PWATCH_ERR_FAILED_TO_READ,
     PWATCH_ERR_FAILED_TO_ACQUIRE_MEMORY,
     PWATCH_ERR_FAILED_TO_PROCESS_ADMIN_FLAG,
+    PWATCH_ERR_FAILED_TO_PARSE,
     PWATCH_ERR_FAILED_TO_PROCESS_SIGNAL,
     PWATCH_ERR_FAILED_TO_PROCESS_STATUS
 };
 
 enum pwatch_adminFlagsNum {
-    PWATCH_ADMIN_READ           = BIT(0),
-    PWATCH_ADMIN_PARSE          = BIT(1),
+    PWATCH_ADMIN_INIT           = BIT(0),
+    PWATCH_ADMIN_READ           = BIT(1),
+    PWATCH_ADMIN_PARSE          = BIT(2),
     PWATCH_ADMIN_PARSE_CLOSED   = BIT(29),
     PWATCH_ADMIN_READ_CLOSED    = BIT(30),
     PWATCH_ADMIN_CLOSE          = BIT(31)
@@ -66,7 +69,7 @@ typedef struct pwatch_semaphore {
     pthread_cond_t empty;
 } pwatch_semaphore;
 
-extern pwatch_parsedInfo parsedInfo;
+extern pwatch_parsedInfo *parsedInfo;
 
 extern pwatch_semaphore *readSemaphore;
 
@@ -74,9 +77,9 @@ extern pwatch_queueLineBuf *readBuff;
 
 extern uint32_t adminFlags;
 
-extern uint32_t cpuStatList;
-
 extern pthread_mutex_t lock;
+
+void pwatch_parseInfoPtr(unsigned int **Ptr);
 
 const char *procStatPath = "/proc/stat";
 

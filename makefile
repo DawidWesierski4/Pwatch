@@ -8,7 +8,7 @@ HEADER_FILES_WITH_PATH :=$(shell find $(SRC_DIR) -iname "*.h" )
 #OJB_FILES := $(addsuffix .o, $(notdir $(SRC_FILES_WITH_PATH)))
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = #-Wall -Wextra -Werror -pthread
 
 $(BUILD_DIR)/$(TARGET): $(SRC_FILES_WITH_PATH) $(HEADER_FILES_WITH_PATH)
 	mkdir -p $(BUILD_DIR)
