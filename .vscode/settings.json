@@ -1,20 +1,20 @@
 {
-    "cSpell.words": [
-        "iowait",
-        "niced",
-        "pwatch",
-        "softirq",
-        "softirqs"
-    ],
-    "C_Cpp.errorSquiggles": "disabled",
-    "makefile.launchConfigurations": [
-        {
-            "cwd": "/home/test/Pwatch/build",
-            "binaryPath": "/home/test/Pwatch/build/pwatch",
-            "binaryArgs": []
-        }
-    ],
-    "files.associations": {
-        "time.h": "c"
-    }
+	"cSpell.words": [
+		"iowait",
+		"niced",
+		"pwatch",
+		"softirq",
+		"softirqs"
+	],
+	"C_Cpp.errorSquiggles": "disabled",
+	"makefile.launchConfigurations": [
+		{
+			"cwd": "/home/test/Pwatch/build",
+			"binaryPath": "/home/test/Pwatch/build/pwatch",
+			"binaryArgs": []
+		}
+	],
+	"files.associations": {
+		"time.h": "c"
+	}
 }

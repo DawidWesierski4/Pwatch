@@ -1,18 +1,25 @@
-TARGET = pwatch
+CC := gcc
+CFLAGS := -Wall -Wextra -pthread
 
-BUILD_DIR := ./build
-SRC_DIR := ./src
+SRCDIR := src
+BUILDDIR := build
+TARGET := $(BUILDDIR)/pwatch
 
-SRC_FILES_WITH_PATH :=$(shell find $(SRC_DIR) -name "*.c" )
-HEADER_FILES_WITH_PATH :=$(shell find $(SRC_DIR) -iname "*.h" )
-#OJB_FILES := $(addsuffix .o, $(notdir $(SRC_FILES_WITH_PATH)))
+SRCEXT := c
+SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
-CC = gcc
-CFLAGS = #-Wall -Wextra -Werror -pthread
+DEBUG_FLAGS := -g
 
-$(BUILD_DIR)/$(TARGET): $(SRC_FILES_WITH_PATH) $(HEADER_FILES_WITH_PATH)
-	mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(SRC_FILES_WITH_PATH) -o $@
+$(TARGET): $(OBJECTS)
+	@mkdir -p $(BUILDDIR)
+	$(CC) $(CFLAGS) $(DEBUG_FLAGS) -o $(TARGET) $^
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIR)
+	$(CC) $(CFLAGS) $(DEBUG_FLAGS) -c -o $@ $<
+
+.PHONY: clean
 
 clean:
-	-rm -r -f $(BUILD_DIR)
+	@rm -rf $(BUILDDIR)
